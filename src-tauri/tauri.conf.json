@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "lyys",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.lyys.launcher",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,9 +13,11 @@
     "windows": [
       {
         "label": "main",
-        "title": "lyys",
-        "width": 1290,
-        "height": 540,
+        "title": "Lyys Launcher",
+        "width": 960,
+        "height": 640,
+        "center": true,
+        "decorations": false,
         "resizable": false,
         "fullscreen": false
       }
