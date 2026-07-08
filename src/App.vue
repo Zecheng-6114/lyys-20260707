@@ -297,6 +297,10 @@ async function stopGame() {
               </div>
             </div>
             <div class="field">
+              <label>玩家名称</label>
+              <input v-model="playerName" placeholder="输入用户名..." />
+            </div>
+            <div class="field">
               <label>Java 路径</label>
               <div class="field-row">
                 <select v-model="javaPath">
