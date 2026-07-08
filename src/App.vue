@@ -26,7 +26,6 @@ interface Config {
 }
 
 interface LogEntry {
-  time: string
   text: string
   level: 'info' | 'warn' | 'err'
 }
@@ -38,6 +37,7 @@ const loading = ref(false)
 const running = ref(false)
 const error = ref<string | null>(null)
 const showError = ref(false)
+const gameError = ref(false)
 
 const javaPath = ref('')
 const gameDir = ref('')
@@ -86,6 +86,7 @@ onMounted(async () => {
       addLog('游戏已退出')
       running.value = false
     }
+    gameError.value = false
   })
 })
 
@@ -125,16 +126,14 @@ function showErr(msg: string) {
 }
 
 function addLog(text: string) {
-  const now = new Date()
-  const time = now.toLocaleTimeString('zh-CN', { hour12: false })
   let level: LogEntry['level'] = 'info'
   const lower = text.toLowerCase()
   if (lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('[e]')) {
     level = 'err'
-  } else if (lower.includes('warn') || lower.includes('warn')) {
+  } else if (lower.includes('warn')) {
     level = 'warn'
   }
-  logs.value.push({ time, text, level })
+  logs.value.push({ text, level })
   if (logs.value.length > 5000) logs.value.splice(0, logs.value.length - 5000)
   nextTick(() => autoScroll())
 }
@@ -179,6 +178,7 @@ function setMemPreset(gb: number) {
 async function launch() {
   if (!selectedVersion.value || !playerName.value.trim()) return
   loading.value = true
+  gameError.value = false
   logs.value = []
   addLog('正在启动...')
 
@@ -209,6 +209,7 @@ async function launch() {
   } catch (e) {
     addLog(`启动失败: ${e}`)
     showErr(`${e}`)
+    gameError.value = true
   } finally {
     loading.value = false
   }
@@ -259,9 +260,7 @@ async function stopGame() {
         <!-- 启动页 / 日志 -->
         <div class="tab-panel log-tab" :class="{ active: activeTab === 'launch' }" id="tab-launch">
           <div class="log-panel" ref="logContainer">
-            <div v-for="(l, i) in logs" :key="i" class="log-line" :class="'log-' + l.level">
-              <span class="log-time">{{ l.time }}</span>{{ l.text }}
-            </div>
+            <div v-for="(l, i) in logs" :key="i" class="log-line" :class="'log-' + l.level">{{ l.text }}</div>
             <div v-if="logs.length === 0" class="placeholder-text">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="4 17 10 11 4 17"></polyline><line x1="12" y1="17" x2="20" y2="17"></line></svg>
               点击下方「启动游戏」开始
@@ -343,7 +342,7 @@ async function stopGame() {
 
     <!-- 状态栏 -->
     <footer class="statusbar">
-      <span class="status-tag" v-if="selectedVersion">
+      <span class="status-tag" :class="{ 'status-ok': running, 'status-err': gameError }" v-if="selectedVersion">
         <span class="dot"></span>{{ selectedVersion }}
       </span>
       <span class="status-spacer"></span>
@@ -471,7 +470,7 @@ body {
 }
 
 .content {
-  flex: 1; padding: 22px 24px;
+  flex: 1; padding: 40px 24px 22px 24px;
   overflow-y: scroll;
   display: flex; flex-direction: column; gap: 16px;
   scrollbar-width: thin;
@@ -487,7 +486,7 @@ body {
 }
 .tab-panel.active { display: flex; }
 .tab-panel.log-tab {
-  margin: -22px -24px;
+  margin: -40px -24px -22px -24px;
 }
 
 @keyframes fadeSlide {
@@ -636,13 +635,12 @@ select {
   color: #888;
 }
 .dot {
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
 }
-.status-ok { display: inline-flex; align-items: center; gap: 6px; }
-.status-ok .dot { background: var(--green); box-shadow: 0 0 5px rgba(74,222,128,0.5); }
 .status-tag {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--yellow-bg); border: 1px solid rgba(250,204,21,0.15);
@@ -652,6 +650,20 @@ select {
 }
 .status-tag .dot { background: var(--yellow); box-shadow: 0 0 4px rgba(250,204,21,0.5); }
 .status-tag:hover { background: rgba(250,204,21,0.15); }
+.status-ok {
+  color: var(--green) !important;
+  background: rgba(74,222,128,0.1) !important;
+  border-color: rgba(74,222,128,0.2) !important;
+}
+.status-ok:hover { background: rgba(74,222,128,0.18) !important; }
+.status-ok .dot { background: var(--green); box-shadow: 0 0 5px rgba(74,222,128,0.5); }
+.status-err {
+  color: #ef4444 !important;
+  background: rgba(239,68,68,0.1) !important;
+  border-color: rgba(239,68,68,0.2) !important;
+}
+.status-err:hover { background: rgba(239,68,68,0.18) !important; }
+.status-err .dot { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.5); }
 .status-spacer { margin-left: auto; }
 .status-settings {
   display: inline-flex; align-items: center; gap: 5px;
@@ -676,6 +688,7 @@ select {
   font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, monospace;
   font-size: 11px;
   line-height: 1.7;
+  padding-top: 44px;
 }
 .log-line {
   padding: 1px 16px;
@@ -684,7 +697,6 @@ select {
   word-break: break-all;
 }
 .log-line:hover { background: rgba(255,255,255,0.02); }
-.log-time { color: var(--text-dim); margin-right: 8px; }
 .log-info { color: var(--text); }
 .log-warn { color: var(--yellow); }
 .log-err { color: var(--red); }
