@@ -242,12 +242,13 @@ async function stopGame() {
 <template>
   <div class="window">
     <div class="titlebar" data-tauri-drag-region @mousedown="startDrag">
+      <span class="titlebar-text" v-if="playerName">{{ playerName }}</span>
       <div class="titlebar-controls">
         <button class="titlebar-btn" @mousedown.stop @click="titleMinimize" title="最小化">
-          <svg width="10" height="10" viewBox="0 0 12 12"><rect x="1.5" y="5.5" width="9" height="1.2" rx="0.6" fill="currentColor"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
         <button class="titlebar-btn titlebar-close" @mousedown.stop @click="titleClose" title="关闭">
-          <svg width="10" height="10" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
@@ -349,7 +350,7 @@ async function stopGame() {
       <span class="status-settings" @click="switchTab(activeTab === 'settings' ? 'launch' : 'settings')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
       </span>
-      <button class="launch-btn" @click="running ? stopGame() : launch()" :disabled="loading || (!running && (!selectedVersion || !playerName))">
+      <button class="launch-btn" :class="{ running: running }" @click="running ? stopGame() : launch()" :disabled="loading || (!running && (!selectedVersion || !playerName))">
         {{ loading ? '启动中...' : running ? '■ 停止游戏' : '▶ 启动游戏' }}
       </button>
     </footer>
@@ -412,15 +413,20 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .titlebar {
-  height: 34px;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  height: 40px;
   display: flex;
   align-items: center;
   padding: 0 6px 0 16px;
-  background: var(--surface);
-  flex-shrink: 0;
+  background: rgba(18, 18, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   user-select: none;
 }
 .titlebar-text {
@@ -434,17 +440,16 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-right: -3px;
+  margin-right: -2px;
 }
 .titlebar-btn {
-  width: 28px;
-  height: 28px;
+  padding: 8px;
   border: none;
   background: transparent;
   color: var(--text-dim);
   cursor: pointer;
   border-radius: 4px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
@@ -616,8 +621,13 @@ select {
 }
 .statusbar .launch-btn:hover {
   background: #9b6dff;
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.5);
   transform: none;
+}
+.statusbar .launch-btn.running {
+  background: #dc2626;
+}
+.statusbar .launch-btn.running:hover {
+  background: #ef4444;
 }
 .statusbar .launch-btn:disabled {
   background: #444;

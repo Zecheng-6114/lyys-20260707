@@ -105,14 +105,16 @@ pub async fn launch_game(app: AppHandle, state: State<'_, AppState>, params: Lau
         let child = {
             let st: tauri::State<'_, AppState> = app_clone.state();
             let mut p = st.running_process.lock().await;
-            let c = p.take();
-            drop(p);
-            let _ = st.running_pid.store(0, Ordering::SeqCst);
-            c
+            p.take()
         };
         if let Some(mut c) = child {
             let _ = c.wait().await;
+            let st: tauri::State<'_, AppState> = app_clone.state();
+            st.running_pid.store(0, Ordering::SeqCst);
             let _ = app_clone.emit("game-exit", ());
+        } else {
+            let st: tauri::State<'_, AppState> = app_clone.state();
+            st.running_pid.store(0, Ordering::SeqCst);
         }
     });
     Ok(pid)
