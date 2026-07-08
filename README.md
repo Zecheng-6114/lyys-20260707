@@ -1,73 +1,52 @@
-# lyys-20260707
+# Lyys Launcher
 
-This template should help get you started developing with Vue 3 in Vite.
+基于 Tauri 2.x + Vue 3 的 Minecraft 启动器。
 
-## Recommended IDE Setup
+## 技术栈
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+| 层 | 技术 |
+|---|---|
+| 桌面框架 | Tauri 2.x |
+| 前端 | Vue 3 + TypeScript + Vite |
+| 后端 | Rust (tokio 异步) |
 
-## Recommended Browser Setup
+## 功能
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- 离线账号登录
+- Java 自动检测与手动指定
+- 本地版本扫描（含 inheritsFrom 继承链合并）
+- classpath 构建、natives 解压
+- 游戏参数构建与进程启动
+- 游戏进程监控（启动/停止/退出监听）
+- 版本隔离
+- 内存与分辨率设置
 
-## Type Support for `.vue` Imports in TS
+## 开发
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
+# 安装依赖
 npm install
+
+# 开发模式
+npm run tauri dev
+
+# 构建
+npm run tauri build
 ```
 
-### Compile and Hot-Reload for Development
+## 项目结构
 
-```sh
-npm run dev
 ```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
-
-```sh
-# Install browsers for the first run
-npx playwright install
-
-# When testing on CI, must build the project first
-npm run build
-
-# Runs the end-to-end tests
-npm run test:e2e
-# Runs the tests only on Chromium
-npm run test:e2e -- --project=chromium
-# Runs the tests of a specific file
-npm run test:e2e -- tests/example.spec.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+src/              # Vue 前端
+src-tauri/        # Rust 后端
+  src/
+    commands.rs   # Tauri IPC 命令
+    models.rs     # 数据结构
+    services/     # 核心逻辑
+      launcher.rs # 启动命令构建
+      version.rs  # 版本解析
+      library.rs  # 依赖库处理
+      rules.rs    # 参数规则评估
+      java.rs     # Java 检测
+      config.rs   # 配置管理
 ```
