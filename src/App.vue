@@ -636,7 +636,7 @@ body {
   background: transparent;
   border: none;
   box-shadow: none;
-  padding: 20px;
+  padding: 20px 5px;
   margin: 0;
 }
 .card-header {
@@ -879,7 +879,7 @@ select {
   color: var(--text-dim);
   font-size: 13px;
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px 5px;
   opacity: 0.7;
 }
 .placeholder-text svg {
@@ -895,10 +895,10 @@ select {
   font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
   font-size: 11px;
   line-height: 1.7;
-  padding: 16px 20px;
+  padding: 16px 5px;
 }
 .log-line {
-  padding: 1px 16px;
+  padding: 1px 5px;
   color: var(--text-secondary);
   white-space: pre-wrap;
   word-break: break-all;
@@ -925,7 +925,7 @@ select {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 5px;
   cursor: pointer;
   border-radius: 4px;
   transition: background 0.15s;
